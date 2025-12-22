@@ -123,6 +123,67 @@
       © 2025 Munaf Malik
     </footer>
   </div>
+<!-- Munaf Malik AI Chatbot -->
+<div id="munaf-ai-chatbot" style="
+position:fixed;
+bottom:20px;
+right:20px;
+width:320px;
+height:420px;
+background:#ffffff;
+border-radius:14px;
+box-shadow:0 10px 40px rgba(0,0,0,0.25);
+display:flex;
+flex-direction:column;
+z-index:999999;
+font-family:Inter, sans-serif;
+color:#000;
+">
+
+  <div style="background:#0f172a;color:#fff;padding:12px;font-weight:600;">
+    Munaf Malik AI Assistant
+  </div>
+
+  <div id="chatBody" style="flex:1;padding:10px;overflow-y:auto;">
+    <div><b>AI:</b> Hi! Ask me anything.</div>
+  </div>
+
+  <div style="display:flex;border-top:1px solid #eee;">
+    <input id="chatInput" placeholder="Ask anything..." style="flex:1;padding:10px;border:none;">
+    <button id="sendBtn" style="padding:10px;background:#0f172a;color:#fff;border:none;">
+      Send
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  function sendMessage() {
+    const input = document.getElementById("chatInput");
+    const chatBody = document.getElementById("chatBody");
+    const text = input.value.trim();
+    if (!text) return;
+
+    chatBody.innerHTML += `<div><b>You:</b> ${text}</div>`;
+    input.value = "";
+
+    fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    })
+    .then(r => r.json())
+    .then(d => {
+      chatBody.innerHTML += `<div><b>AI:</b> ${d.reply}</div>`;
+    })
+    .catch(() => {
+      chatBody.innerHTML += `<div style="color:red;"><b>AI:</b> Error</div>`;
+    });
+  }
+
+  document.getElementById("sendBtn").onclick = sendMessage;
+})();
+</script>
 
 </body>
 </html>
