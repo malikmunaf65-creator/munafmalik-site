@@ -1,6 +1,10 @@
 export async function handler(event) {
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return {
+      statusCode: 405,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method not allowed" })
+    };
   }
 
   try {
@@ -15,8 +19,15 @@ export async function handler(event) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "You are Munaf Malik's AI assistant." },
-          { role: "user", content: message }
+          {
+            role: "system",
+            content:
+              "You are Munaf Malik's professional AI assistant. Explain his web development, AI/ML services, pricing, timelines, and certifications clearly."
+          },
+          {
+            role: "user",
+            content: message
+          }
         ]
       })
     });
@@ -25,14 +36,24 @@ export async function handler(event) {
 
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      },
       body: JSON.stringify({
-        reply: data.choices?.[0]?.message?.content || "No reply"
+        reply: data.choices?.[0]?.message?.content || "No response from AI"
       })
     };
-  } catch (err) {
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      },
+      body: JSON.stringify({
+        error: error.message
+      })
     };
   }
 }
