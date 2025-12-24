@@ -3,7 +3,7 @@ export async function handler(event) {
     return {
       statusCode: 405,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Method not allowed" })
+      body: JSON.stringify({ error: "Method Not Allowed" })
     };
   }
 
@@ -29,7 +29,7 @@ export async function handler(event) {
           {
             role: "system",
             content:
-              "You are Munaf Malik's professional AI assistant. Explain his web development, AI/ML services, pricing, timelines, and certifications clearly and professionally."
+              "You are the AI assistant for munafmalik.site. Speak professionally and help users understand services, pricing, and how to contact Munaf Malik."
           },
           {
             role: "user",
@@ -54,16 +54,11 @@ export async function handler(event) {
       },
       body: JSON.stringify({ reply })
     };
-  } catch (error) {
+  } catch (err) {
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      },
-      body: JSON.stringify({
-        error: "AI request failed"
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "OpenAI request failed" })
     };
   }
 }
