@@ -8,21 +8,28 @@ export async function handler(event) {
   }
 
   try {
-    const { message } = JSON.parse(event.body);
+    const { message } = JSON.parse(event.body || "{}");
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    if (!message) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Message is required" })
+      };
+    }
+
+    const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
+        model: "gpt-4.1-mini",
+        input: [
           {
             role: "system",
             content:
-              "You are Munaf Malik's professional AI assistant. Explain his web development, AI/ML services, pricing, timelines, and certifications clearly."
+              "You are Munaf Malik's professional AI assistant. Explain his web development, AI/ML services, pricing, timelines, and certifications clearly and professionally."
           },
           {
             role: "user",
@@ -34,15 +41,18 @@ export async function handler(event) {
 
     const data = await response.json();
 
+    const reply =
+      data.output_text ||
+      data.output?.[0]?.content?.[0]?.text ||
+      "No response from AI";
+
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
       },
-      body: JSON.stringify({
-        reply: data.choices?.[0]?.message?.content || "No response from AI"
-      })
+      body: JSON.stringify({ reply })
     };
   } catch (error) {
     return {
@@ -52,7 +62,7 @@ export async function handler(event) {
         "Access-Control-Allow-Origin": "*"
       },
       body: JSON.stringify({
-        error: error.message
+        error: "AI request failed"
       })
     };
   }
